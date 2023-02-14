@@ -14,14 +14,13 @@ fill:
         jnz fill
 call _start
 ; Definição da frequência das notas
-frequency_C:  dw 262
-frequency_D:  dw 294
-frequency_E:  dw 330
-frequency_F:  dw 349
-frequency_G:  dw 392
-frequency_A:  dw 440
-frequency_B:  dw 494
-
+frequency_C:  dw 400
+frequency_D:  dw 500
+frequency_E:  dw 600
+frequency_F:  dw 700
+frequency_G:  dw 800
+frequency_B:  dw 900
+frequency_A:  dw 1000
 ; Duracao das notas
 duration_whole:  dd 2000
 duration_half:   dd 1000
@@ -54,13 +53,10 @@ playNote:
         push eax
         mov edx,0
         mov ecx,0
-        mov eax,3168
+        mov eax,1193181
         idiv ebx
-        mov edx,0
-        mov ecx,0
-        mov ebx,30
-        imul ebx
         mov dx,ax
+        mov al,0xb6
         out 43h, al
         mov al, dl
         out 42h, al
