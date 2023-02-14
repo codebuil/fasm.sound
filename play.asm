@@ -23,9 +23,9 @@ frequency_A:  dw 440
 frequency_B:  dw 494
 
 ; Duracao das notas
-duration_whole:  dw 2000
-duration_half:   dw 1000
-duration_quarter: dw 500
+duration_whole:  dd 2000
+duration_half:   dd 1000
+duration_quarter: dd 500
 
 ; Porta para o speaker (3x64h)
 speaker_port: db 0x61
@@ -39,8 +39,8 @@ playNote:
     push ecx
     push edx
 
-    mov ebx, [esp + 8] ; frequencia da nota
-    mov cx, [esp + 12] ; duracao da nota
+    push eax ; frequencia da nota
+   push ebx ; duracao da nota
 
     ; Ativa o speaker
     in al, 0x61
@@ -49,8 +49,8 @@ playNote:
 
     noteLoop:
         ; Gera o som da nota
-        push ecx
-        push ebx
+        pop eax
+        pop ebx
         push eax
         mov edx,0
         mov ecx,0
@@ -58,93 +58,64 @@ playNote:
         idiv ebx
         mov edx,0
         mov ecx,0
-        mov ebx,7
+        mov ebx,30
+        imul ebx
         mov dx,ax
-        pop eax
-        pop ebx
-        pop ecx
         out 43h, al
         mov al, dl
         out 42h, al
         mov al, dh
         out 42h, al
-
-        ; Espera por 1/8 da duracao da nota
-        push cx
-        push bx
-        push ax
-        mov dx,0
-        mov cx,0
-        mov ax,cx
-        mov bx,8
-        idiv bx
-        mov dx,ax
-        pop ax
-        pop bx
-        pop cx
+        pop ecx
+        waitLoop3:
+        mov ebx,10000
         waitLoop:
-            dec dx
+            dec ebx
             jnz waitLoop
+           dec ecx
+           jnz waitLoop3
 
         ; Desativa o speaker
         in al,  0x61
         and al, 0xFC
         out  0x61, al
 
-        ; Espera por 7/8 da duracao da nota
-        push cx
-        push bx
-        push ax
-        mov dx,0
-        mov cx,0
-        mov ax,cx
-        mov bx,8
-        idiv bx
-        mov dx,0
-        mov cx,0
-        mov bx,7
-        imul bx
-        mov dx,ax
-        pop ax
-        pop bx
-        pop cx
-        mov bx,dur1
-        cs
-        mov [dur1],dx
-        noteLoopss:
-                cs
-                mov dx,[dur1]
-        waitLoop2:
-            dec dx
-            jnz waitLoop2
-
-    ; Decrementa a duração da nota
-     noteLoops:
-    dec cx
-    jnz noteLoops
-
     ; Restaura o registrador
     pop edx
     pop ecx
     pop ebx
     ret
-
+pauses:
+        mov ecx,eax
+        waitLoop33:
+        mov ebx,10000
+        waitLoop333:
+            dec ebx
+            jnz waitLoop333
+           dec ecx
+           jnz waitLoop33
+           ret
 _start:
     ; Toca a nota C por 1 segundo
     mov eax, frequency_C
     mov ebx, duration_whole
     call playNote
+    mov eax,duration_quarter
+    call pauses
 
     ; Toca a nota D por 1/2 segundo
     mov eax, frequency_D
     mov ebx, duration_half
     call playNote
+    mov eax,duration_quarter
+    call pauses
 
     ; Toca a nota E por 1/4 segundo
     mov eax, frequency_E
     mov ebx, duration_quarter
     call playNote
-
+    mov eax,duration_quarter
+    call pauses
     ; Sair do programa
     mov eax, 1
     xor ebx, ebx
