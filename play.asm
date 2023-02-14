@@ -13,20 +13,16 @@ fill:
         cmp cx,0
         jnz fill
 call _start
-; Definição da frequência das notas
-frequency_C:  dw 400
-frequency_D:  dw 500
-frequency_E:  dw 600
-frequency_F:  dw 700
-frequency_G:  dw 800
-frequency_B:  dw 900
-frequency_A:  dw 1000
-; Duracao das notas
-duration_whole:  dd 2000
-duration_half:   dd 1000
-duration_quarter: dd 500
+
 
 ; Porta para o speaker (3x64h)
+Ng equ  400
+Nf equ  450
+Ne equ  500
+Nd equ  550
+Nc equ  600
+Nb equ  650
+Na equ 700
 speaker_port: db 0x61
 dur1: dw 0
 dur2: dw 0
@@ -64,7 +60,7 @@ playNote:
         out 42h, al
         pop ecx
         waitLoop3:
-        mov ebx,10000
+        mov ebx,100
         waitLoop:
             dec ebx
             jnz waitLoop
@@ -84,7 +80,7 @@ playNote:
 pauses:
         mov ecx,eax
         waitLoop33:
-        mov ebx,10000
+        mov ebx,100
         waitLoop333:
             dec ebx
             jnz waitLoop333
@@ -93,24 +89,47 @@ pauses:
            ret
 _start:
     ; Toca a nota C por 1 segundo
-    mov eax, frequency_C
-    mov ebx, duration_whole
+    mov eax, Ng
+    mov ebx, 2000
     call playNote
-    mov eax,duration_quarter
+    mov eax,500
     call pauses
 
-    ; Toca a nota D por 1/2 segundo
-    mov eax, frequency_D
-    mov ebx, duration_half
+    mov eax, Nf
+    mov ebx, 2000
     call playNote
-    mov eax,duration_quarter
+    mov eax,500
     call pauses
 
-    ; Toca a nota E por 1/4 segundo
-    mov eax, frequency_E
-    mov ebx, duration_quarter
+
+    mov eax, Ne
+    mov ebx, 2000
     call playNote
-    mov eax,duration_quarter
+    mov eax,500
+    call pauses
+
+    mov eax, Nd
+    mov ebx, 2000
+    call playNote
+    mov eax,500
+    call pauses
+
+    mov eax, Nc
+    mov ebx, 2000
+    call playNote
+    mov eax,500
+    call pauses
+
+    mov eax, Nb
+    mov ebx, 2000
+    call playNote
+    mov eax,500
+    call pauses
+
+    mov eax, Na
+    mov ebx, 2000
+    call playNote
+    mov eax,500
     call pauses
     ; Sair do programa
     mov eax, 1
